@@ -10,7 +10,7 @@
           "verify_ssl": "Verify SSL certificate"
         },
         "data_description": {
-          "url": "Base URL of your Schreibwerkstatt, e.g. https://schreibwerkstatt.example.com",
+          "url": "Base URL of your Schreibwerkstatt, as you open it in the browser (without /metrics)",
           "api_token": "Token starting with sw_"
         }
       },
