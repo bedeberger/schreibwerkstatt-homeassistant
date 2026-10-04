@@ -322,8 +322,8 @@
       "type": "gauge",
       "group": "content",
       "title": {
-        "de": "Seiten",
-        "en": "Pages"
+        "de": "Abschnitte",
+        "en": "Sections"
       },
       "unit": null,
       "device_class": null,

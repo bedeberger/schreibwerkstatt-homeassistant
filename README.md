@@ -52,7 +52,7 @@ host name only needs the URL updated — re-adding the integration with the new 
 |---|---|
 | **Schreibwerkstatt** | uptime, memory, database size, JS errors (24 h), pending registrations |
 | Schreibwerkstatt Users | users per status, active users 24 h / 7 days |
-| Schreibwerkstatt Content | books, chapters, pages, characters, words, standard pages |
+| Schreibwerkstatt Content | books, chapters, sections, characters, words, standard pages |
 | Schreibwerkstatt Writing | writing / editing / dictation time today, net words today |
 | Schreibwerkstatt Jobs | running and queued jobs, finished / failed in 24 h |
 | Schreibwerkstatt AI | cost today / this month / total, tokens per provider and model, Anthropic billing |
