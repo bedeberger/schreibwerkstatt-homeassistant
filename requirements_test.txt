@@ -1,0 +1,5 @@
+# Pins Home Assistant 2025.1 — the minimum version in hacs.json.
+pytest-homeassistant-custom-component==0.13.205
+ruff
+# pycares >= 4.9 starts a background thread that the HA 2025.1 test harness flags as lingering.
+pycares<4.9

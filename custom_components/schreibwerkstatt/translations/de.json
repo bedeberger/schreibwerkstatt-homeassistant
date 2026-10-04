@@ -1,0 +1,54 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Schreibwerkstatt verbinden",
+        "description": "Einen Token legst du in der Schreibwerkstatt unter Admin → Einstellungen → API / Metrics an. Mit „Werte pro Benutzer“ kommen auch Schreibzeit, Wörter und Kosten je Benutzer.",
+        "data": {
+          "url": "URL",
+          "api_token": "API-Token",
+          "verify_ssl": "SSL-Zertifikat prüfen"
+        },
+        "data_description": {
+          "url": "Basis-URL deiner Schreibwerkstatt, z. B. https://schreibwerkstatt.example.com",
+          "api_token": "Token, beginnt mit sw_"
+        }
+      },
+      "reauth_confirm": {
+        "title": "API-Token erneuern",
+        "description": "Der Token für {url} wird nicht mehr akzeptiert. Lege unter Admin → Einstellungen → API / Metrics einen neuen an.",
+        "data": {
+          "api_token": "API-Token"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Der Token wurde abgelehnt (ungültig, widerrufen, abgelaufen oder ohne metrics:read).",
+      "cannot_connect": "Server nicht erreichbar.",
+      "not_supported": "Dieser Server hat kein /metrics.json. Bitte die Schreibwerkstatt auf 4.16 oder neuer aktualisieren.",
+      "unsupported_schema": "Der Server nutzt ein neueres Metrik-Format. Bitte diese Integration aktualisieren.",
+      "unknown": "Unerwarteter Fehler, siehe Log."
+    },
+    "abort": {
+      "already_configured": "Diese Schreibwerkstatt ist bereits eingerichtet.",
+      "reauth_successful": "Token erneuert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "data": {
+          "scan_interval": "Abfrageintervall (Sekunden)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "daily_goal_reached": {
+        "name": "Tagesziel erreicht"
+      }
+    }
+  }
+}

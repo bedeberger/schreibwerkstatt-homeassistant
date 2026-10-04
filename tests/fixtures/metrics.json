@@ -1,0 +1,1334 @@
+{
+  "schema": 1,
+  "instance_id": "00000000-0000-4000-8000-000000000001",
+  "version": "4.16.0",
+  "generated_at": "2026-10-04T08:00:00.000Z",
+  "timezone": "Europe/Zurich",
+  "today": "2026-10-04",
+  "includes_users": true,
+  "metrics": [
+    {
+      "name": "sw_build_info",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Version",
+        "en": "Version"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": null,
+      "reset": null,
+      "icon": null,
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": false,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "version": "4.16.0"
+          },
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "sw_process_uptime_seconds",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Laufzeit",
+        "en": "Uptime"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:timer-outline",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 3600
+        }
+      ]
+    },
+    {
+      "name": "sw_process_resident_memory_bytes",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Arbeitsspeicher",
+        "en": "Memory"
+      },
+      "unit": "B",
+      "device_class": "data_size",
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:memory",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 81383424
+        }
+      ]
+    },
+    {
+      "name": "sw_process_heap_used_bytes",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Heap belegt",
+        "en": "Heap used"
+      },
+      "unit": "B",
+      "device_class": "data_size",
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:memory",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 11804472
+        }
+      ]
+    },
+    {
+      "name": "sw_db_size_bytes",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Datenbankgrösse",
+        "en": "Database size"
+      },
+      "unit": "B",
+      "device_class": "data_size",
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:database",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 5668320
+        }
+      ]
+    },
+    {
+      "name": "sw_db_schema_version",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Schema-Version",
+        "en": "Schema version"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": null,
+      "reset": null,
+      "icon": "mdi:database-cog",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 304
+        }
+      ]
+    },
+    {
+      "name": "sw_js_errors_24h",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "JS-Fehler 24 h",
+        "en": "JS errors 24 h"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:alert-circle-outline",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_registration_requests_pending",
+      "type": "gauge",
+      "group": "server",
+      "title": {
+        "de": "Offene Registrierungen",
+        "en": "Pending registrations"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:account-question",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_users",
+      "type": "gauge",
+      "group": "users",
+      "title": {
+        "de": "Benutzer",
+        "en": "Users"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:account-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "status": "active"
+          },
+          "value": 2
+        },
+        {
+          "labels": {
+            "status": "invited"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "status": "suspended"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "status": "deleted"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_active_users_24h",
+      "type": "gauge",
+      "group": "users",
+      "title": {
+        "de": "Aktive Benutzer 24 h",
+        "en": "Active users 24 h"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:account-clock",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "sw_active_users_7d",
+      "type": "gauge",
+      "group": "users",
+      "title": {
+        "de": "Aktive Benutzer 7 Tage",
+        "en": "Active users 7 days"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:account-clock-outline",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "sw_books",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Bücher",
+        "en": "Books"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:book-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "sw_pages",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Seiten",
+        "en": "Pages"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:file-document-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "sw_chapters",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Kapitel",
+        "en": "Chapters"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:book-open-variant",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_chars",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Zeichen",
+        "en": "Characters"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:format-letter-case",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 7200
+        }
+      ]
+    },
+    {
+      "name": "sw_words",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Wörter",
+        "en": "Words"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:text",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1200
+        }
+      ]
+    },
+    {
+      "name": "sw_normseiten",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Normseiten",
+        "en": "Standard pages"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:file-document-outline",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "sw_writing_seconds_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Schreibzeit heute",
+        "en": "Writing time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:fountain-pen-tip",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1800
+        }
+      ]
+    },
+    {
+      "name": "sw_lektorat_seconds_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Lektoratszeit heute",
+        "en": "Editing time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:spellcheck",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_stt_seconds_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Diktatzeit heute",
+        "en": "Dictation time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:microphone",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_stt_chars_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Diktierte Zeichen heute",
+        "en": "Dictated characters today"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:microphone-message",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_words_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Wörter heute",
+        "en": "Words today"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": "day",
+      "icon": "mdi:text-box-plus",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "sw_jobs_running",
+      "type": "gauge",
+      "group": "jobs",
+      "title": {
+        "de": "Laufende Jobs",
+        "en": "Running jobs"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:cog-play",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_jobs_queued",
+      "type": "gauge",
+      "group": "jobs",
+      "title": {
+        "de": "Wartende Jobs",
+        "en": "Queued jobs"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:tray-full",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_jobs_ended_24h",
+      "type": "gauge",
+      "group": "jobs",
+      "title": {
+        "de": "Beendete Jobs 24 h",
+        "en": "Finished jobs 24 h"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:cog-transfer",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "status": "done"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "status": "error"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "status": "cancelled"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_tokens_in_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "Input-Tokens",
+        "en": "Input tokens"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:import",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "provider": "claude",
+            "model": "claude-sonnet-4-6"
+          },
+          "value": 1000
+        }
+      ]
+    },
+    {
+      "name": "sw_tokens_out_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "Output-Tokens",
+        "en": "Output tokens"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:export",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "provider": "claude",
+            "model": "claude-sonnet-4-6"
+          },
+          "value": 500
+        }
+      ]
+    },
+    {
+      "name": "sw_cache_read_tokens_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "Cache-Read-Tokens",
+        "en": "Cache read tokens"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:cached",
+      "diagnostic": false,
+      "enabled_default": false,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "provider": "claude",
+            "model": "claude-sonnet-4-6"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_cache_creation_tokens_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "Cache-Write-Tokens",
+        "en": "Cache write tokens"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:cached",
+      "diagnostic": false,
+      "enabled_default": false,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "provider": "claude",
+            "model": "claude-sonnet-4-6"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_cost_usd_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "KI-Kosten gesamt",
+        "en": "AI cost total"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": null,
+      "icon": "mdi:cash",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "provider": "claude",
+            "model": "claude-sonnet-4-6"
+          },
+          "value": 0.42
+        }
+      ]
+    },
+    {
+      "name": "sw_cost_usd_today",
+      "type": "gauge",
+      "group": "ai",
+      "title": {
+        "de": "KI-Kosten heute",
+        "en": "AI cost today"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": "day",
+      "icon": "mdi:cash-clock",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0.42
+        }
+      ]
+    },
+    {
+      "name": "sw_cost_usd_month",
+      "type": "gauge",
+      "group": "ai",
+      "title": {
+        "de": "KI-Kosten Monat",
+        "en": "AI cost this month"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": "month",
+      "icon": "mdi:cash-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0.42
+        }
+      ]
+    },
+    {
+      "name": "sw_cost_usd_by_type_total",
+      "type": "counter",
+      "group": "ai",
+      "title": {
+        "de": "KI-Kosten nach Typ",
+        "en": "AI cost by type"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": null,
+      "icon": "mdi:cash",
+      "diagnostic": false,
+      "enabled_default": false,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "source": "job",
+            "type": "lektorat"
+          },
+          "value": 0.42
+        }
+      ]
+    },
+    {
+      "name": "sw_merge_silent_total",
+      "type": "counter",
+      "group": "merge",
+      "title": {
+        "de": "Stille Merges",
+        "en": "Silent merges"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:call-merge",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_merge_conflict_shown_total",
+      "type": "counter",
+      "group": "merge",
+      "title": {
+        "de": "Merge-Konflikte angezeigt",
+        "en": "Merge conflicts shown"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:source-branch",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_merge_fallback_overwrite_total",
+      "type": "counter",
+      "group": "merge",
+      "title": {
+        "de": "Merge-Überschreibungen",
+        "en": "Merge overwrites"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:content-save-alert",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_merge_conflict_resolved_total",
+      "type": "counter",
+      "group": "merge",
+      "title": {
+        "de": "Merge-Konflikte gelöst",
+        "en": "Merge conflicts resolved"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total_increasing",
+      "reset": null,
+      "icon": "mdi:source-merge",
+      "diagnostic": true,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {
+            "choice": "local"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "choice": "remote"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "choice": "both"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_writing_seconds_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Schreibzeit heute",
+        "en": "Writing time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:fountain-pen-tip",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 1800
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_lektorat_seconds_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Lektoratszeit heute",
+        "en": "Editing time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:spellcheck",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_stt_seconds_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Diktatzeit heute",
+        "en": "Dictation time today"
+      },
+      "unit": "s",
+      "device_class": "duration",
+      "state_class": "total_increasing",
+      "reset": "day",
+      "icon": "mdi:microphone",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 0
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_daily_goal_percent",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Tagesziel",
+        "en": "Daily goal"
+      },
+      "unit": "%",
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:target",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 100
+        }
+      ]
+    },
+    {
+      "name": "sw_user_words_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Wörter heute",
+        "en": "Words today"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": "day",
+      "icon": "mdi:text-box-plus",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 200
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_books",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Bücher",
+        "en": "Books"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:book-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 1
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_words",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Wörter",
+        "en": "Words"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:text",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 1200
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_cost_usd_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "KI-Kosten heute",
+        "en": "AI cost today"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": "day",
+      "icon": "mdi:cash-clock",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 0.42
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_cost_usd_month",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "KI-Kosten Monat",
+        "en": "AI cost this month"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": "month",
+      "icon": "mdi:cash-multiple",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 0.42
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_cost_usd_total",
+      "type": "counter",
+      "group": "user",
+      "title": {
+        "de": "KI-Kosten gesamt",
+        "en": "AI cost total"
+      },
+      "unit": "USD",
+      "device_class": "monetary",
+      "state_class": "total",
+      "reset": null,
+      "icon": "mdi:cash",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 0.42
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_last_seen_timestamp_seconds",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Zuletzt gesehen",
+        "en": "Last seen"
+      },
+      "unit": "s",
+      "device_class": "timestamp",
+      "state_class": null,
+      "reset": null,
+      "icon": "mdi:account-clock",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 1791100800
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 1791100800
+        }
+      ]
+    }
+  ]
+}

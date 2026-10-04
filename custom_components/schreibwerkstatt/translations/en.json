@@ -1,0 +1,54 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Schreibwerkstatt",
+        "description": "Create a token in Schreibwerkstatt under Admin → Settings → API / Metrics. Tick \"Per-user values\" to also get writing time, words and cost per user.",
+        "data": {
+          "url": "URL",
+          "api_token": "API token",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "url": "Base URL of your Schreibwerkstatt, e.g. https://schreibwerkstatt.example.com",
+          "api_token": "Token starting with sw_"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Renew API token",
+        "description": "The token for {url} is no longer accepted. Create a new one under Admin → Settings → API / Metrics.",
+        "data": {
+          "api_token": "API token"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The token was rejected (invalid, revoked, expired or without metrics:read).",
+      "cannot_connect": "Could not reach the server.",
+      "not_supported": "This server has no /metrics.json. Update Schreibwerkstatt to 4.16 or later.",
+      "unsupported_schema": "The server uses a newer metrics format. Update this integration.",
+      "unknown": "Unexpected error, see the log."
+    },
+    "abort": {
+      "already_configured": "This Schreibwerkstatt instance is already set up.",
+      "reauth_successful": "Token renewed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "daily_goal_reached": {
+        "name": "Daily goal reached"
+      }
+    }
+  }
+}
