@@ -1,10 +1,10 @@
 # Schreibwerkstatt for Home Assistant
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
-[![Validate](https://github.com/bedeberger/schreibwerkstatt-homeassistant/actions/workflows/validate.yml/badge.svg)](https://github.com/bedeberger/schreibwerkstatt-homeassistant/actions/workflows/validate.yml)
-[![Tests](https://github.com/bedeberger/schreibwerkstatt-homeassistant/actions/workflows/tests.yml/badge.svg)](https://github.com/bedeberger/schreibwerkstatt-homeassistant/actions/workflows/tests.yml)
+[![Validate](https://github.com/schreibwerkstatt/homeassistant/actions/workflows/validate.yml/badge.svg)](https://github.com/schreibwerkstatt/homeassistant/actions/workflows/validate.yml)
+[![Tests](https://github.com/schreibwerkstatt/homeassistant/actions/workflows/tests.yml/badge.svg)](https://github.com/schreibwerkstatt/homeassistant/actions/workflows/tests.yml)
 
-Brings a [Schreibwerkstatt](https://github.com/bedeberger/schreibwerkstatt) server into Home Assistant:
+Brings a [Schreibwerkstatt](https://github.com/schreibwerkstatt/schreibwerkstatt) server into Home Assistant:
 server health, users, content, writing activity, AI token usage and cost — and, if you allow it,
 the same per user.
 
@@ -24,7 +24,7 @@ Home Assistant automatically, without a new release of this integration.
 
 ### HACS
 
-1. HACS → ⋮ → **Custom repositories** → add `https://github.com/bedeberger/schreibwerkstatt-homeassistant`, category **Integration**.
+1. HACS → ⋮ → **Custom repositories** → add `https://github.com/schreibwerkstatt/homeassistant`, category **Integration**.
 2. Install **Schreibwerkstatt**, restart Home Assistant.
 3. **Settings → Devices & services → Add integration → Schreibwerkstatt**.
 
@@ -94,4 +94,4 @@ the contract itself is documented in the server repository (`docs/metrics-api.md
 
 ## License
 
-MIT
+MIT – see [LICENSE](LICENSE).
