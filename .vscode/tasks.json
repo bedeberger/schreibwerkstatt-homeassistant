@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: venv + Testabhängigkeiten",
+      "type": "shell",
+      "command": "python3.12 -m venv .venv && .venv/bin/pip install -U pip && .venv/bin/pip install -r requirements_test.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests (pytest)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/pytest -q",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint (ruff check + format --check)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/ruff check . && ${workspaceFolder}/.venv/bin/ruff format --check .",
+      "problemMatcher": []
+    },
+    {
+      "label": "CI lokal (Lint + Tests)",
+      "dependsOn": ["Lint (ruff check + format --check)", "Tests (pytest)"],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
