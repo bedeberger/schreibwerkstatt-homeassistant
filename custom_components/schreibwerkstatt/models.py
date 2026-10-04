@@ -7,6 +7,8 @@ from typing import Any
 
 # Labels that identify a user; they select the device, not the entity name.
 USER_LABELS = ("user", "user_name")
+# Labels that describe rather than identify: a renamed user keeps their entities.
+DESCRIPTIVE_LABELS = ("user_name",)
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,10 +54,11 @@ class Sample:
 
 
 def sample_key(name: str, labels: dict[str, str]) -> str:
-    """Stable identity of a sample: metric name plus sorted labels."""
-    if not labels:
+    """Stable identity of a sample: metric name plus its sorted identifying labels."""
+    keys = sorted(k for k in labels if k not in DESCRIPTIVE_LABELS)
+    if not keys:
         return name
-    return name + "|" + "|".join(f"{k}={labels[k]}" for k in sorted(labels))
+    return name + "|" + "|".join(f"{k}={labels[k]}" for k in keys)
 
 
 @dataclass(slots=True)

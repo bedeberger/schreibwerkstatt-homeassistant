@@ -65,6 +65,8 @@ class SchreibwerkstattConfigFlow(ConfigFlow, domain=DOMAIN):
     """Set up a Schreibwerkstatt instance by URL and API token."""
 
     VERSION = 1
+    # 1.2: unique IDs without the user_name label.
+    MINOR_VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}

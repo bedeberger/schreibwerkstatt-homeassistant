@@ -65,6 +65,30 @@ devices per client version) are created disabled — enable the ones you want.
 Daily and monthly totals report `last_reset` (midnight / first of month in the server's time zone),
 so long-term statistics restart correctly.
 
+User devices are named after the display name in Schreibwerkstatt (the e-mail if none is set) and
+identified by the e-mail: when the name changes, the device is renamed and entities, entity IDs and
+history stay.
+
+### Dashboard
+
+The integration ships a dashboard strategy that builds a complete dashboard from the entities that
+actually exist — one section per user seen in the last 14 days (the others in a compact list; daily
+goal gauge and AI tiles only where they apply), daily token charts for the AI models used in the last
+30 days (input and output apart), every model ever used under *Content & operations*, enabled
+breakdowns under *Diagnostics*. No entity IDs to adapt: they depend on the users'
+display names and your HA language, so the strategy asks the integration instead of guessing.
+
+**Settings → Dashboards → Add dashboard → New dashboard from scratch → ⋮ → Raw configuration editor**:
+
+```yaml
+strategy:
+  type: custom:schreibwerkstatt
+```
+
+New users and models appear on the next reload of the dashboard. To customise it, use
+**⋮ → Take control**: Home Assistant turns the generated dashboard into regular YAML with your
+real entity IDs. See [examples/dashboard.yaml](examples/dashboard.yaml) for the options.
+
 ### Automation example
 
 ```yaml

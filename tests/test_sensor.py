@@ -27,7 +27,7 @@ def _entity_id(hass: HomeAssistant, platform: str, key: str) -> str:
     return entity_id
 
 
-ANNA = "user=anna@example.com|user_name=Anna"
+ANNA = "user=anna@example.com"
 
 
 async def test_sensors_follow_the_description(
@@ -115,7 +115,7 @@ async def test_new_samples_appear_and_missing_become_unavailable(
     await config_entry.runtime_data.async_refresh()
     await hass.async_block_till_done()
 
-    cleo = hass.states.get(_entity_id(hass, "sensor", "sw_user_books|user=cleo@example.com|user_name=Cleo"))
+    cleo = hass.states.get(_entity_id(hass, "sensor", "sw_user_books|user=cleo@example.com"))
     assert cleo.state == "3"
     assert hass.states.get(_entity_id(hass, "sensor", "sw_cost_usd_today")).state == "unavailable"
 
@@ -135,3 +135,56 @@ async def test_unload(hass: HomeAssistant, mock_metrics: AsyncMock, config_entry
     await _setup(hass, config_entry)
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.NOT_LOADED
+
+
+async def test_renamed_user_keeps_entities(
+    hass: HomeAssistant, mock_metrics: AsyncMock, metrics_doc: dict[str, Any], config_entry
+) -> None:
+    await _setup(hass, config_entry)
+    writing = _entity_id(hass, "sensor", f"sw_user_writing_seconds_today|{ANNA}")
+    doc = copy.deepcopy(metrics_doc)
+    for metric in doc["metrics"]:
+        for sample in metric["samples"]:
+            if sample["labels"].get("user") == "anna@example.com":
+                sample["labels"]["user_name"] = "Anna Muster"
+    mock_metrics.return_value = doc
+    await config_entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+
+    # Same entity, still reporting; the device follows the new display name.
+    assert _entity_id(hass, "sensor", f"sw_user_writing_seconds_today|{ANNA}") == writing
+    assert float(hass.states.get(writing).state) == 30
+    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, f"{INSTANCE}_user_anna@example.com")})
+    assert device.name == "Anna Muster"
+
+
+async def test_migrates_unique_ids_without_user_name(
+    hass: HomeAssistant, mock_metrics: AsyncMock, config_entry
+) -> None:
+    config_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(config_entry, minor_version=1)
+    registry = er.async_get(hass)
+    old = f"{INSTANCE}_sw_user_writing_seconds_today|user=anna@example.com|user_name=Anna"
+    kept = registry.async_get_or_create(
+        "sensor", DOMAIN, old, config_entry=config_entry, suggested_object_id="anna_old"
+    )
+    # Renamed once already under 1.1: a second entity for the same user and metric.
+    dup = registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        f"{INSTANCE}_sw_user_writing_seconds_today|user=anna@example.com|user_name=Ann",
+        config_entry=config_entry,
+        suggested_object_id="ann_old",
+    )
+    untouched = registry.async_get_or_create(
+        "sensor", DOMAIN, f"{INSTANCE}_sw_users|status=active", config_entry=config_entry
+    )
+
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert config_entry.minor_version == 2
+    assert registry.async_get(kept.entity_id).unique_id == f"{INSTANCE}_sw_user_writing_seconds_today|{ANNA}"
+    assert hass.states.get(kept.entity_id).state not in ("unavailable", "unknown")  # fed by the new key
+    assert registry.async_get(dup.entity_id).unique_id.endswith("user_name=Ann")
+    assert registry.async_get(untouched.entity_id).unique_id == f"{INSTANCE}_sw_users|status=active"
