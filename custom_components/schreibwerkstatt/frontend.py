@@ -88,7 +88,8 @@ async def _async_ensure_resource(hass: HomeAssistant, url: str) -> bool:
         add_extra_js_url(hass, url)
         return True
 
-    items = (await resources.async_items()) or []
+    # ResourceStorage.async_items is a @callback (returns a list), not a coroutine.
+    items = resources.async_items() or []
     for item in items:
         if str(item.get("url", "")).split("?")[0] != STRATEGY_URL:
             continue
