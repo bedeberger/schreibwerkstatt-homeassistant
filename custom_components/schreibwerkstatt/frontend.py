@@ -7,6 +7,7 @@ metric + labels → entity_id and builds the dashboard from that.
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,7 @@ import voluptuous as vol
 from homeassistant.components import websocket_api
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.loader import async_get_integration
@@ -24,6 +26,8 @@ from .coordinator import SchreibwerkstattCoordinator
 from .entity import instance_key, user_identifier
 from .models import USER_LABELS
 
+_LOGGER = logging.getLogger(__name__)
+
 STRATEGY_URL = f"/{DOMAIN}/{DOMAIN}-strategy.js"
 STRATEGY_FILE = Path(__file__).parent / "frontend" / f"{DOMAIN}-strategy.js"
 # Pseudo metric of the "daily goal reached" binary sensor.
@@ -31,16 +35,69 @@ GOAL_REACHED = "daily_goal_reached"
 
 
 async def async_setup_frontend(hass: HomeAssistant) -> None:
-    """Register the websocket command and, with a frontend, the strategy module."""
+    """Register the websocket command, the static path and a Lovelace resource for the strategy."""
     websocket_api.async_register_command(hass, ws_entities)
     if "frontend" not in hass.config.components or hass.http is None:
         return
-    # Imported late: the frontend package is not installed everywhere (tests).
-    from homeassistant.components.frontend import add_extra_js_url
 
     version = (await async_get_integration(hass, DOMAIN)).version
     await hass.http.async_register_static_paths([StaticPathConfig(STRATEGY_URL, str(STRATEGY_FILE), False)])
-    add_extra_js_url(hass, f"{STRATEGY_URL}?v={version}")
+    strategy_url = f"{STRATEGY_URL}?v={version}"
+
+    # Lovelace resources are awaited before the dashboard renders; add_extra_js_url
+    # modules are not (home-assistant/frontend#52570) and race the 5 s
+    # strategy-load timeout. In storage mode register the module as a resource so the
+    # user does not have to. YAML mode and "not yet initialised" each get a
+    # best-effort fallback; the latter retries on home-assistant start-up.
+    if await _async_ensure_resource(hass, strategy_url):
+        return
+
+    async def _on_started(_event: Any) -> None:
+        await _async_ensure_resource(hass, strategy_url)
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _on_started)
+
+
+async def _async_ensure_resource(hass: HomeAssistant, url: str) -> bool:
+    """Make sure the strategy module is registered as a Lovelace resource.
+
+    Returns True once the resource is in place (created, already up to date, or a
+    YAML-mode fallback logged). Returns False when Lovelace is not yet initialised
+    so the caller can retry on home-assistant start-up.
+    """
+    # Imported late: the frontend package is not installed everywhere (tests).
+    from homeassistant.components.frontend import add_extra_js_url
+
+    lovelace = hass.data.get("lovelace")
+    if lovelace is None:
+        return False
+
+    # HA 2025.1 stores lovelace as a plain dict, newer releases as a dataclass.
+    if isinstance(lovelace, dict):
+        resources = lovelace.get("resources")
+    else:
+        resources = getattr(lovelace, "resources", None)
+    if resources is None or not hasattr(resources, "async_create_item"):
+        _LOGGER.warning(
+            "Lovelace is in YAML mode: to stop the 'Timeout waiting for strategy "
+            "element' error when configuring the Schreibwerkstatt dashboard, add "
+            "this to configuration.yaml under lovelace.resources:"
+            "\n  - url: %s\n    type: module",
+            url,
+        )
+        add_extra_js_url(hass, url)
+        return True
+
+    items = (await resources.async_items()) or []
+    for item in items:
+        if str(item.get("url", "")).split("?")[0] != STRATEGY_URL:
+            continue
+        if item.get("url") == url:
+            return True
+        await resources.async_update_item(item["id"], {"url": url})
+        return True
+    await resources.async_create_item({"res_type": "module", "url": url})
+    return True
 
 
 @callback

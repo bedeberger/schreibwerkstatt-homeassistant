@@ -78,12 +78,32 @@ goal gauge and AI tiles only where they apply), daily token charts for the AI mo
 breakdowns under *Diagnostics*. No entity IDs to adapt: they depend on the users'
 display names and your HA language, so the strategy asks the integration instead of guessing.
 
-**Settings → Dashboards → Add dashboard → New dashboard from scratch → ⋮ → Raw configuration editor**:
+In **storage mode** (the HA default), the integration registers the strategy module as a Lovelace
+resource on start-up — nothing to do. **Settings → Dashboards → Add dashboard → New dashboard from
+scratch → ⋮ → Raw configuration editor**:
 
 ```yaml
 strategy:
   type: custom:schreibwerkstatt
 ```
+
+In **YAML mode** (rare), Lovelace resource lists are read-only and cannot be edited from an
+integration, so you have to add the resource by hand. A warning is logged on every start-up with
+the exact line to add:
+
+```yaml
+lovelace:
+  mode: yaml
+  resources:
+    - url: /schreibwerkstatt/schreibwerkstatt-strategy.js?v=0.4.0
+      type: module
+```
+
+Without the resource the dashboard renders only intermittently: the strategy module is fetched
+fire-and-forget and races a 5 s timeout (HA frontend issue #52570), so on cold loads
+Home Assistant reports *Timeout waiting for strategy element ll-strategy-dashboard-schreibwerkstatt
+to be registered*. A hard refresh usually fixes it for that session, but the proper fix is the
+resource entry — they are awaited, `add_extra_js_url` modules are not.
 
 New users and models appear on the next reload of the dashboard. To customise it, use
 **⋮ → Take control**: Home Assistant turns the generated dashboard into regular YAML with your
