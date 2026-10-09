@@ -88,16 +88,22 @@ async def _async_ensure_resource(hass: HomeAssistant, url: str) -> bool:
         add_extra_js_url(hass, url)
         return True
 
+    # The storage collection loads lazily (on the first websocket list). Before that
+    # async_items() is empty, so creating right away added one more copy per restart.
+    if not getattr(resources, "loaded", True):
+        await resources.async_load()
+        resources.loaded = True
+
     # ResourceStorage.async_items is a @callback (returns a list), not a coroutine.
-    items = resources.async_items() or []
-    for item in items:
-        if str(item.get("url", "")).split("?")[0] != STRATEGY_URL:
-            continue
-        if item.get("url") == url:
-            return True
-        await resources.async_update_item(item["id"], {"url": url})
+    ours = [i for i in resources.async_items() or [] if str(i.get("url", "")).split("?")[0] == STRATEGY_URL]
+    if not ours:
+        await resources.async_create_item({"res_type": "module", "url": url})
         return True
-    await resources.async_create_item({"res_type": "module", "url": url})
+    keep, *duplicates = ours
+    for item in duplicates:
+        await resources.async_delete_item(item["id"])
+    if keep.get("url") != url:
+        await resources.async_update_item(keep["id"], {"url": url})
     return True
 
 

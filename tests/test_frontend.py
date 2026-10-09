@@ -72,3 +72,48 @@ async def test_renamed_user_device_and_entity(
     (entry,) = (await client.receive_json())["result"]["entries"]
     assert [u["name"] for u in entry["users"]] == ["Ben", "Zora"]
     assert _find(entry, "sw_user_writing_seconds_today", "anna@example.com") == "sensor.zora_minutes"
+
+
+class _Resources:
+    """Stand-in for ResourceStorageCollection: empty until loaded."""
+
+    loaded = False
+
+    def __init__(self, stored: list[dict[str, Any]]) -> None:
+        self._stored = stored
+        self.items: list[dict[str, Any]] = []
+
+    async def async_load(self) -> None:
+        self.items = list(self._stored)
+
+    def async_items(self) -> list[dict[str, Any]]:
+        return self.items
+
+    async def async_create_item(self, data: dict[str, Any]) -> None:
+        self.items.append({"id": f"new{len(self.items)}", "url": data["url"], "type": data["res_type"]})
+
+    async def async_update_item(self, item_id: str, data: dict[str, Any]) -> None:
+        next(i for i in self.items if i["id"] == item_id).update(data)
+
+    async def async_delete_item(self, item_id: str) -> None:
+        self.items = [i for i in self.items if i["id"] != item_id]
+
+
+async def test_resource_not_duplicated_and_deduped(hass: HomeAssistant) -> None:
+    from custom_components.schreibwerkstatt.frontend import STRATEGY_URL, _async_ensure_resource
+
+    url = f"{STRATEGY_URL}?v=9"
+    other = {"id": "x", "url": "/local/card.js", "type": "module"}
+    resources = _Resources(
+        [other, {"id": "a", "url": f"{STRATEGY_URL}?v=1"}, {"id": "b", "url": f"{STRATEGY_URL}?v=2"}]
+    )
+    hass.data["lovelace"] = {"resources": resources}
+
+    assert await _async_ensure_resource(hass, url)
+    assert resources.items == [other, {"id": "a", "url": url}]
+
+    # A fresh, unloaded collection on the next start must not get a second copy.
+    resources = _Resources([other, {"id": "a", "url": url}])
+    hass.data["lovelace"] = {"resources": resources}
+    assert await _async_ensure_resource(hass, url)
+    assert resources.items == [other, {"id": "a", "url": url}]
