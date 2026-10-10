@@ -1,4 +1,4 @@
-"""Minimal client for the Schreibwerkstatt /metrics.json endpoint."""
+"""Minimal client for the Schreibwerkstatt metrics endpoints."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Any
 
 import aiohttp
 
-from .const import METRICS_PATH, REQUEST_TIMEOUT, SUPPORTED_SCHEMA
+from .const import HISTORY_PATH, HISTORY_TIMEOUT, METRICS_PATH, REQUEST_TIMEOUT, SUPPORTED_SCHEMA
 
 
 class SchreibwerkstattError(Exception):
@@ -54,27 +54,38 @@ class SchreibwerkstattClient:
 
     async def async_get_metrics(self) -> dict[str, Any]:
         """Return the parsed /metrics.json document."""
-        headers = {
-            "Authorization": f"Bearer {self._token}",
-            "Accept": "application/json",
-        }
-        try:
-            async with asyncio.timeout(REQUEST_TIMEOUT):
-                async with self._session.get(
-                    self._url + METRICS_PATH, headers=headers, allow_redirects=False
-                ) as resp:
-                    if resp.status in (401, 403):
-                        raise SchreibwerkstattAuthError(f"HTTP {resp.status}")
-                    if resp.status == 404:
-                        raise SchreibwerkstattNotSupportedError("no /metrics.json")
-                    if resp.status != 200:
-                        raise SchreibwerkstattConnectionError(f"HTTP {resp.status}")
-                    data = await resp.json(content_type=None)
-        except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-            raise SchreibwerkstattConnectionError(str(err) or type(err).__name__) from err
-
+        data = await self._get(METRICS_PATH, REQUEST_TIMEOUT)
         if not isinstance(data, dict) or not isinstance(data.get("metrics"), list):
             raise SchreibwerkstattSchemaError("unexpected document")
         if int(data.get("schema") or 0) > SUPPORTED_SCHEMA:
             raise SchreibwerkstattSchemaError(f"schema {data.get('schema')}")
         return data
+
+    async def async_get_history(self) -> dict[str, Any]:
+        """Return the daily series of /metrics/history.json (servers from 4.21 on)."""
+        data = await self._get(HISTORY_PATH, HISTORY_TIMEOUT)
+        if not isinstance(data, dict) or not isinstance(data.get("series"), list):
+            raise SchreibwerkstattSchemaError("unexpected document")
+        if int(data.get("schema") or 0) > SUPPORTED_SCHEMA:
+            raise SchreibwerkstattSchemaError(f"schema {data.get('schema')}")
+        return data
+
+    async def _get(self, path: str, timeout: float) -> Any:
+        headers = {
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/json",
+        }
+        try:
+            async with asyncio.timeout(timeout):
+                async with self._session.get(
+                    self._url + path, headers=headers, allow_redirects=False
+                ) as resp:
+                    if resp.status in (401, 403):
+                        raise SchreibwerkstattAuthError(f"HTTP {resp.status}")
+                    if resp.status == 404:
+                        raise SchreibwerkstattNotSupportedError(f"no {path}")
+                    if resp.status != 200:
+                        raise SchreibwerkstattConnectionError(f"HTTP {resp.status}")
+                    return await resp.json(content_type=None)
+        except (aiohttp.ClientError, TimeoutError, ValueError) as err:
+            raise SchreibwerkstattConnectionError(str(err) or type(err).__name__) from err

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 from custom_components.schreibwerkstatt.const import DOMAIN
 from homeassistant.core import HomeAssistant
@@ -117,3 +118,37 @@ async def test_resource_not_duplicated_and_deduped(hass: HomeAssistant) -> None:
     hass.data["lovelace"] = {"resources": resources}
     assert await _async_ensure_resource(hass, url)
     assert resources.items == [other, {"id": "a", "url": url}]
+
+
+async def test_resource_created_when_missing(hass: HomeAssistant) -> None:
+    from custom_components.schreibwerkstatt.frontend import STRATEGY_URL, _async_ensure_resource
+
+    url = f"{STRATEGY_URL}?v=9"
+    other = {"id": "x", "url": "/local/card.js", "type": "module"}
+    resources = _Resources([other])
+    # Newer HA releases keep lovelace data in a dataclass instead of a dict.
+    hass.data["lovelace"] = SimpleNamespace(resources=resources)
+
+    assert await _async_ensure_resource(hass, url)
+    assert resources.loaded
+    assert resources.items == [other, {"id": "new1", "url": url, "type": "module"}]
+
+
+async def test_resource_yaml_mode(hass: HomeAssistant) -> None:
+    from custom_components.schreibwerkstatt.frontend import STRATEGY_URL, _async_ensure_resource
+
+    url = f"{STRATEGY_URL}?v=9"
+    # ResourceYAMLCollection: read-only, no async_create_item.
+    yaml_resources = SimpleNamespace(loaded=True, async_items=list)
+    hass.data["lovelace"] = {"resources": yaml_resources}
+
+    with patch("homeassistant.components.frontend.add_extra_js_url") as add_js:
+        assert await _async_ensure_resource(hass, url)
+    add_js.assert_called_once_with(hass, url)
+
+
+async def test_resource_lovelace_not_ready(hass: HomeAssistant) -> None:
+    from custom_components.schreibwerkstatt.frontend import STRATEGY_URL, _async_ensure_resource
+
+    hass.data.pop("lovelace", None)
+    assert not await _async_ensure_resource(hass, f"{STRATEGY_URL}?v=9")

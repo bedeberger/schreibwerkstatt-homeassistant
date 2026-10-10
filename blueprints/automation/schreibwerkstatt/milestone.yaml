@@ -1,0 +1,52 @@
+blueprint:
+  name: Schreibwerkstatt – milestone
+  description: >
+    Runs your actions when a Schreibwerkstatt counter passes a round mark, for
+    example every 100,000 characters in stock or every 10,000 characters of a
+    person. Not after a restart or an outage: only a real step from one value
+    to the next counts. In the actions, `{{ milestone }}` is the mark that was
+    passed and `{{ name }}` the sensor's name.
+  domain: automation
+  source_url: https://github.com/schreibwerkstatt/homeassistant/blob/main/blueprints/automation/schreibwerkstatt/milestone.yaml
+  input:
+    sensor:
+      name: Counter
+      description: E.g. Characters (Schreibwerkstatt Content) or Characters of one person.
+      selector:
+        entity:
+          filter:
+            - integration: schreibwerkstatt
+              domain: sensor
+    step:
+      name: Every
+      description: The mark repeats in this step.
+      default: 100000
+      selector:
+        number:
+          min: 1
+          max: 100000000
+          mode: box
+    actions:
+      name: Actions
+      description: E.g. a notification "{{ name }} – {{ milestone }} reached".
+      selector:
+        action: {}
+
+mode: queued
+
+triggers:
+  - trigger: state
+    entity_id: !input sensor
+
+variables:
+  step: !input step
+  old: "{{ trigger.from_state.state | float(none) if trigger.from_state else none }}"
+  new: "{{ trigger.to_state.state | float(none) if trigger.to_state else none }}"
+  milestone: "{{ ((new // step) * step) | int if new is not none else 0 }}"
+  name: "{{ trigger.to_state.name if trigger.to_state else '' }}"
+
+conditions:
+  - condition: template
+    value_template: "{{ old is not none and new is not none and new // step > old // step }}"
+
+actions: !input actions

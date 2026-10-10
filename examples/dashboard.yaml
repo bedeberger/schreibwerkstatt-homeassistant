@@ -4,8 +4,9 @@
 # → ⋮ → Raw-Konfigurationseditor → diesen Inhalt einfügen.
 #
 # Die Integration baut das Dashboard selbst aus den vorhandenen Entitäten:
-# ein Abschnitt pro Person, die in den letzten 14 Tagen da war (die übrigen
-# kompakt in einer Liste), Tagesziel und KI-Kacheln nur, wo es sie braucht, und
+# vorne die Zeichen (heute, im Bestand, pro Buch und Person, Tempo), unter
+# „Personen“ ein Abschnitt pro Person, die in den letzten 14 Tagen da war (die
+# übrigen kompakt in einer Liste), Tagesziel und KI-Kacheln nur, wo es sie braucht, und
 # in den Tagesdiagrammen nur die KI-Modelle der letzten 30 Tage – ohne Entity-IDs
 # von Hand anzupassen. Neue Personen und Modelle erscheinen beim nächsten Laden
 # des Dashboards.

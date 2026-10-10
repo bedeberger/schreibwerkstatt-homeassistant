@@ -105,7 +105,7 @@ class SchreibwerkstattSensor(SchreibwerkstattEntity, SensorEntity):
         sample = self.sample
         if sample is None or not sample.metric.reset or self._attr_state_class != SensorStateClass.TOTAL:
             return None
-        tz = UTC if sample.metric.name in UTC_RESET_METRICS else _zone(self.coordinator.data.timezone)
+        tz = UTC if sample.metric.name in UTC_RESET_METRICS else zone(self.coordinator.data.timezone)
         now = datetime.now(tz)
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         if sample.metric.reset == "month":
@@ -113,7 +113,8 @@ class SchreibwerkstattSensor(SchreibwerkstattEntity, SensorEntity):
         return start
 
 
-def _zone(name: str) -> ZoneInfo:
+def zone(name: str) -> ZoneInfo:
+    """Time zone of the server, UTC if unknown here."""
     try:
         return ZoneInfo(name)
     except (ZoneInfoNotFoundError, ValueError):

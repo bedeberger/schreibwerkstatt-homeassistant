@@ -7,6 +7,7 @@ from typing import Final
 DOMAIN: Final = "schreibwerkstatt"
 
 METRICS_PATH: Final = "/metrics.json"
+HISTORY_PATH: Final = "/metrics/history.json"
 # Highest /metrics.json contract version this integration understands.
 SUPPORTED_SCHEMA: Final = 1
 
@@ -14,6 +15,8 @@ DEFAULT_SCAN_INTERVAL: Final = 60
 MIN_SCAN_INTERVAL: Final = 30
 MAX_SCAN_INTERVAL: Final = 3600
 REQUEST_TIMEOUT: Final = 15
+# The history walks every daily snapshot once; on a big instance that takes a moment.
+HISTORY_TIMEOUT: Final = 120
 
 GOAL_METRIC: Final = "sw_user_daily_goal_percent"
 

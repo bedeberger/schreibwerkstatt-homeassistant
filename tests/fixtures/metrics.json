@@ -318,6 +318,30 @@
       ]
     },
     {
+      "name": "sw_books_written",
+      "type": "gauge",
+      "group": "content",
+      "title": {
+        "de": "Bücher mit Text",
+        "en": "Books with text"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:book-check",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1
+        }
+      ]
+    },
+    {
       "name": "sw_pages",
       "type": "gauge",
       "group": "content",
@@ -543,7 +567,7 @@
       },
       "unit": null,
       "device_class": null,
-      "state_class": "measurement",
+      "state_class": "total",
       "reset": "day",
       "icon": "mdi:text-box-plus",
       "diagnostic": false,
@@ -554,6 +578,30 @@
         {
           "labels": {},
           "value": 200
+        }
+      ]
+    },
+    {
+      "name": "sw_chars_today",
+      "type": "gauge",
+      "group": "writing",
+      "title": {
+        "de": "Zeichen heute",
+        "en": "Characters today"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total",
+      "reset": "day",
+      "icon": "mdi:format-letter-case",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": false,
+      "samples": [
+        {
+          "labels": {},
+          "value": 1800
         }
       ]
     },
@@ -1102,7 +1150,7 @@
       },
       "unit": null,
       "device_class": null,
-      "state_class": "measurement",
+      "state_class": "total",
       "reset": "day",
       "icon": "mdi:text-box-plus",
       "diagnostic": false,
@@ -1123,6 +1171,40 @@
             "user_name": "Ben"
           },
           "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_chars_today",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Zeichen heute",
+        "en": "Characters today"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "total",
+      "reset": "day",
+      "icon": "mdi:format-letter-case",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 1200
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 600
         }
       ]
     },
@@ -1184,6 +1266,40 @@
             "user_name": "Anna"
           },
           "value": 1200
+        },
+        {
+          "labels": {
+            "user": "ben@example.com",
+            "user_name": "Ben"
+          },
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "sw_user_chars",
+      "type": "gauge",
+      "group": "user",
+      "title": {
+        "de": "Zeichen",
+        "en": "Characters"
+      },
+      "unit": null,
+      "device_class": null,
+      "state_class": "measurement",
+      "reset": null,
+      "icon": "mdi:format-letter-case",
+      "diagnostic": false,
+      "enabled_default": true,
+      "entity": true,
+      "per_user": true,
+      "samples": [
+        {
+          "labels": {
+            "user": "anna@example.com",
+            "user_name": "Anna"
+          },
+          "value": 7200
         },
         {
           "labels": {

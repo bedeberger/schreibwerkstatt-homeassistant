@@ -27,6 +27,12 @@ const TEXT = {
     cacheRead: "Cache", cacheReadTokens: "Cache-Read-Tokens", cacheWriteTokens: "Cache-Write-Tokens",
     otherPeople: "Weitere Personen – länger nicht gesehen",
     stock: "Bestand", chapters: "Kapitel", pages: "Abschnitte", normPages: "Normseiten", chars: "Zeichen",
+    charsToday: "Zeichen heute", chars7: "Zeichen pro Tag – 7 Tage", charsTotal: "Zeichen gesamt",
+    perBook: "Pro Buch (Ø)", perAuthor: "Pro Person (Ø)", charsPerDay: "Netto-Zeichen pro Tag",
+    charsStock: "Zeichen im Bestand", charsStock90: "Zeichen – 90 Tage", averages: "Ø Zeichen pro Buch und Person",
+    charsPerPerson: "Zeichen pro Person", charsTodayPerPerson: "Netto-Zeichen pro Tag und Person",
+    pace: "Zeichen pro Schreibstunde", paceShort: "Tempo", pacePerPerson: "Zeichen pro Schreibstunde und Person",
+    booksWritten: "Bücher mit Text", people: "Personen", todayPerPerson: "Heute pro Person", charsPerMonth: "Zeichen pro Person – Monatsstand",
     users: "Benutzer", active24: "Aktiv 24 h", active7: "Aktiv 7 Tage",
     status: { active: "Aktiv", invited: "Eingeladen", suspended: "Gesperrt", deleted: "Gelöscht" },
     registrations: "Offene Registrierungen", registrationsShort: "Registrierungen",
@@ -67,6 +73,12 @@ const TEXT = {
     cacheRead: "Cache", cacheReadTokens: "Cache read tokens", cacheWriteTokens: "Cache write tokens",
     otherPeople: "Other people – not seen recently",
     stock: "Content", chapters: "Chapters", pages: "Sections", normPages: "Standard pages", chars: "Characters",
+    charsToday: "Characters today", chars7: "Characters per day – 7 days", charsTotal: "Characters total",
+    perBook: "Per book (avg)", perAuthor: "Per person (avg)", charsPerDay: "Net characters per day",
+    charsStock: "Characters in stock", charsStock90: "Characters – 90 days", averages: "Avg characters per book and person",
+    charsPerPerson: "Characters per person", charsTodayPerPerson: "Net characters per day and person",
+    pace: "Characters per writing hour", paceShort: "Pace", pacePerPerson: "Characters per writing hour and person",
+    booksWritten: "Books with text", people: "People", todayPerPerson: "Today per person", charsPerMonth: "Characters per person – month end",
     users: "Users", active24: "Active 24 h", active7: "Active 7 days",
     status: { active: "Active", invited: "Invited", suspended: "Suspended", deleted: "Deleted" },
     registrations: "Pending registrations", registrationsShort: "Registrations",
@@ -115,6 +127,11 @@ class Entities {
     return hit.entity_id;
   }
 
+  // Lookup that does not count as placed: the value also has its own spot elsewhere.
+  peek(metric, user = null) {
+    return this.list(metric, user)[0]?.entity_id;
+  }
+
   // A user shown only in the compact list: their other values must not end up under
   // "More values" either.
   retire(user) {
@@ -157,10 +174,16 @@ function history(title, hours, pairs) {
 }
 
 // A section only when it has something besides its heading.
-function section(heading, icon, cards, { badges, ...extra } = {}) {
+function section(heading, icon, cards, { badges, tap, ...extra } = {}) {
   const body = compact(cards);
   if (body.length === 0) return null;
-  const head = { type: "heading", heading, icon, ...(badges ? { badges: compact(badges) } : {}) };
+  const head = {
+    type: "heading",
+    heading,
+    icon,
+    ...(badges ? { badges: compact(badges) } : {}),
+    ...(tap ? { tap_action: tap } : {}),
+  };
   return { type: "grid", ...extra, cards: [head, ...body] };
 }
 
@@ -234,6 +257,10 @@ function isActive(hass, ent, user) {
   return Number.isNaN(t) || Date.now() - t < ACTIVE_DAYS * 86400_000;
 }
 
+// Net per day: servers from 4.21 report it as a daily total (the day's change); before,
+// as a measurement whose daily maximum is the best there is.
+const netStat = (hass, entity) => (hass.states[entity]?.attributes?.state_class === "measurement" ? "max" : "change");
+
 // Exactly zero, not unknown or unavailable.
 const isZero = (hass, entity) => entity !== undefined && Number(hass.states[entity]?.state ?? NaN) === 0;
 
@@ -247,6 +274,9 @@ function userSection(t, ent, hass, user) {
   const aiTotal = ent.id("sw_user_cost_usd_total", {}, u);
   // Never used AI: two tiles at 0 $ say nothing. They appear once there is a cost.
   const usesAi = !isZero(hass, aiTotal);
+  // Characters where the server reports them; words only from servers before that.
+  const charsToday = ent.id("sw_user_chars_today", {}, u);
+  const wordsToday = ent.id("sw_user_words_today", {}, u);
   return section(
     user.name,
     "mdi:account-edit",
@@ -266,8 +296,9 @@ function userSection(t, ent, hass, user) {
             ],
           }
         : null,
+      tile(charsToday || wordsToday, charsToday ? t.charsToday : t.wordsToday, "indigo"),
       tile(ent.id("sw_user_writing_seconds_today", {}, u), t.writing, "indigo"),
-      tile(ent.id("sw_user_words_today", {}, u), t.wordsToday, "indigo"),
+      tile(ent.id("sw_user_chars_per_hour", {}, u), t.paceShort, "indigo"),
       tile(ent.id("sw_user_lektorat_seconds_today", {}, u), t.editing, "purple"),
       tile(ent.id("sw_user_stt_seconds_today", {}, u), t.dictation, "teal"),
       usesAi && tile(aiToday, t.aiToday, "amber"),
@@ -275,6 +306,7 @@ function userSection(t, ent, hass, user) {
       glance(
         [
           [ent.id("sw_user_books", {}, u), t.books],
+          [ent.id("sw_user_chars", {}, u), t.chars],
           [ent.id("sw_user_words", {}, u), t.words],
           [usesAi && aiTotal, t.aiTotal],
         ],
@@ -309,16 +341,47 @@ function dormantSection(t, ent, users) {
   ]);
 }
 
+// One row per active person: characters today (words on older servers); the heading
+// opens the people view.
+function todayPeople(t, ent, users) {
+  const rows = users.map((user) => {
+    const entity = ent.peek("sw_user_chars_today", user.user) || ent.peek("sw_user_words_today", user.user);
+    return entity && { entity, name: user.name };
+  });
+  return section(
+    t.todayPerPerson,
+    "mdi:account-group",
+    [compact(rows).length > 0 && { type: "entities", entities: compact(rows), state_color: false }],
+    { tap: { action: "navigate", navigation_path: "personen" } },
+  );
+}
+
+function peopleView(t, ent, entry, hass, people) {
+  // Token without per-user values: say so instead of silently showing nobody.
+  const noUsers =
+    !entry.includes_users && section(t.perPerson, "mdi:account-group", [{ type: "markdown", content: t.noUsers }]);
+  return view(
+    t.people,
+    "personen",
+    "mdi:account-group",
+    [
+      ...people.active.map((user) => userSection(t, ent, hass, user)),
+      noUsers,
+      dormantSection(t, ent, people.dormant),
+    ],
+    { max_columns: 4 },
+  );
+}
+
 function todayView(t, ent, entry, hass, people) {
   const failed = ent.id("sw_jobs_ended_24h", { status: "error" });
   const running = ent.id("sw_jobs_running");
   const pending = ent.id("sw_registration_requests_pending");
   const writing = ent.id("sw_writing_seconds_today");
+  const charsToday = ent.id("sw_chars_today");
+  const chars = ent.id("sw_chars");
   const costToday = ent.id("sw_cost_usd_today");
   const billed = ent.id("sw_billed_usd_month");
-  // Token without per-user values: say so instead of silently showing nobody.
-  const noUsers =
-    !entry.includes_users && section(t.perPerson, "mdi:account-group", [{ type: "markdown", content: t.noUsers }]);
 
   return view(
     t.today,
@@ -329,12 +392,17 @@ function todayView(t, ent, entry, hass, people) {
         t.writtenToday,
         "mdi:calendar-today",
         [
-          tile(writing, t.writing, "indigo", { grid_options: { columns: 12 } }),
+          // Characters lead; on servers without them the writing time takes their place.
+          tile(charsToday || writing, charsToday ? t.chars : t.writing, "indigo", { grid_options: { columns: 12 } }),
           tile(ent.id("sw_words_today"), t.words, "indigo"),
+          charsToday && tile(writing, t.writing, "indigo"),
+          tile(ent.id("sw_chars_per_hour"), t.paceShort, "indigo"),
           tile(ent.id("sw_lektorat_seconds_today"), t.editing, "purple"),
           tile(ent.id("sw_stt_seconds_today"), t.dictation, "teal"),
           tile(ent.id("sw_stt_chars_today"), t.dictatedChars, "teal"),
-          stats(t.writing7, [[writing, t.writing]], "change", { days_to_show: 7 }),
+          charsToday
+            ? stats(t.chars7, [[charsToday, t.chars]], netStat(hass, charsToday), { days_to_show: 7 })
+            : stats(t.writing7, [[writing, t.writing]], "change", { days_to_show: 7 }),
         ],
         {
           badges: [
@@ -347,15 +415,19 @@ function todayView(t, ent, entry, hass, people) {
           ],
         },
       ),
-      ...people.active.map((user) => userSection(t, ent, hass, user)),
-      noUsers,
+      section(t.chars, "mdi:format-letter-case", [
+        tile(chars, t.charsTotal, "indigo", { grid_options: { columns: 12 } }),
+        tile(ent.id("sw_chars_per_book"), t.perBook, "indigo", { icon: "mdi:book-open-page-variant" }),
+        tile(ent.id("sw_chars_per_author"), t.perAuthor, "indigo", { icon: "mdi:account-edit" }),
+        stats(t.charsStock90, [[chars, t.chars]], "max", { chart_type: "line", days_to_show: 90 }),
+      ]),
+      todayPeople(t, ent, people.active),
       section(t.aiCost, "mdi:robot-outline", [
         tile(costToday, t.today, "amber"),
         tile(ent.id("sw_cost_usd_month"), t.thisMonth, "amber"),
         tile(billed, t.billed, "deep-orange", { icon: "mdi:receipt-text", grid_options: { columns: 12 } }),
         stats(t.costPerDay, [[costToday, t.aiCost]], "change"),
       ]),
-      dormantSection(t, ent, people.dormant),
     ],
     {
       max_columns: 4,
@@ -382,11 +454,42 @@ function historyView(t, ent, hass, people, usage) {
   const series = (metric, prefix = "") =>
     models.map((labels) => [id(metric, labels), `${prefix}${modelName(labels)}`]);
 
+  const weekly = { chart_type: "line", period: "week", days_to_show: 365 };
+  const charsToday = id("sw_chars_today");
+  const wordsToday = id("sw_words_today");
+  const perToday = per("sw_user_chars_today").filter(([entity]) => entity);
+
   return view(
     t.history,
     "verlauf",
     "mdi:chart-bar",
     [
+      section(
+        t.chars,
+        "mdi:format-letter-case",
+        [
+          stats(t.charsPerDay, [[charsToday, t.chars]], netStat(hass, charsToday), {
+            grid_options: { columns: 12 },
+          }),
+          stats(t.charsStock, [[id("sw_chars"), t.chars]], "max", weekly),
+          stats(
+            t.averages,
+            [
+              [id("sw_chars_per_book"), t.perBook],
+              [id("sw_chars_per_author"), t.perAuthor],
+            ],
+            "mean",
+            weekly,
+          ),
+          stats(t.pace, [[id("sw_chars_per_hour"), t.chars]], "mean"),
+          stats(t.charsPerPerson, per("sw_user_chars"), "max", weekly),
+          // Side by side: one group of bars per month, one bar per person.
+          stats(t.charsPerMonth, per("sw_user_chars"), "max", { period: "month", days_to_show: 365 }),
+          stats(t.charsTodayPerPerson, perToday, netStat(hass, perToday[0]?.[0])),
+          stats(t.pacePerPerson, per("sw_user_chars_per_hour"), "mean"),
+        ],
+        { column_span: 2 },
+      ),
       section(
         t.writingHeading,
         "mdi:fountain-pen-tip",
@@ -401,12 +504,8 @@ function historyView(t, ent, hass, people, usage) {
             "change",
             { grid_options: { columns: 12 } },
           ),
-          stats(t.netWords, [[id("sw_words_today"), t.words]], "max"),
-          stats(t.wordsStock, [[id("sw_words"), t.words]], "max", {
-            chart_type: "line",
-            period: "week",
-            days_to_show: 365,
-          }),
+          stats(t.netWords, [[wordsToday, t.words]], netStat(hass, wordsToday)),
+          stats(t.wordsStock, [[id("sw_words"), t.words]], "max", weekly),
         ],
         { column_span: 2 },
       ),
@@ -467,11 +566,14 @@ function opsView(t, ent, usage) {
     [
       section(t.stock, "mdi:bookshelf", [
         tile(id("sw_books"), t.books, "brown"),
+        tile(id("sw_books_written"), t.booksWritten, "brown"),
         tile(id("sw_chapters"), t.chapters, "brown"),
         tile(id("sw_pages"), t.pages, "brown"),
         tile(id("sw_normseiten"), t.normPages, "brown"),
         tile(id("sw_words"), t.words, "indigo"),
         tile(id("sw_chars"), t.chars, "indigo"),
+        tile(id("sw_chars_per_book"), t.perBook, "indigo"),
+        tile(id("sw_chars_per_author"), t.perAuthor, "indigo"),
       ]),
       section(t.users, "mdi:account-multiple", [
         tile(id("sw_active_users_24h"), t.active24, "green"),
@@ -595,6 +697,7 @@ class SchreibwerkstattDashboardStrategy extends HTMLElement {
     // Order matters: the diagnostics view collects what the others did not use.
     const views = [
       todayView(t, ent, entry, hass, people),
+      peopleView(t, ent, entry, hass, people),
       historyView(t, ent, hass, people, usage),
       opsView(t, ent, usage),
       diagView(t, ent),

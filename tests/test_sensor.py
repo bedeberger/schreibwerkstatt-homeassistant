@@ -120,6 +120,41 @@ async def test_new_samples_appear_and_missing_become_unavailable(
     assert hass.states.get(_entity_id(hass, "sensor", "sw_cost_usd_today")).state == "unavailable"
 
 
+async def test_character_averages(
+    hass: HomeAssistant, mock_metrics: AsyncMock, metrics_doc: dict[str, Any], config_entry
+) -> None:
+    await _setup(hass, config_entry)
+    per_book = _entity_id(hass, "sensor", "sw_chars_per_book")
+    per_author = _entity_id(hass, "sensor", "sw_chars_per_author")
+    assert hass.states.get(per_book).state == "7200"  # 7200 characters, 1 book
+    assert hass.states.get(per_book).attributes["state_class"] == "measurement"
+    assert hass.states.get(per_author).state == "7200"  # Ben has none of his own: not counted
+    assert hass.states.get(_entity_id(hass, "sensor", "sw_chars_per_hour")).state == "3600"
+    assert hass.states.get(_entity_id(hass, "sensor", f"sw_user_chars_per_hour|{ANNA}")).state == "2400"
+    # Ben did not write today: no pace, no sensor.
+    assert (
+        er.async_get(hass).async_get_entity_id(
+            "sensor", DOMAIN, f"{INSTANCE}_sw_user_chars_per_hour|user=ben@example.com"
+        )
+        is None
+    )
+
+    doc = copy.deepcopy(metrics_doc)
+    for metric in doc["metrics"]:
+        if metric["name"] == "sw_user_chars":
+            metric["samples"].append(
+                {"labels": {"user": "cleo@example.com", "user_name": "Cleo"}, "value": 3000}
+            )
+        if metric["name"] == "sw_books_written":
+            metric["samples"][0]["value"] = 0
+    mock_metrics.return_value = doc
+    await config_entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+
+    assert hass.states.get(per_author).state == "5100"
+    assert hass.states.get(per_book).state == "unavailable"  # no book with text, no average
+
+
 async def test_revoked_token_starts_reauth(
     hass: HomeAssistant, mock_metrics: AsyncMock, config_entry
 ) -> None:

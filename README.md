@@ -14,10 +14,11 @@ Home Assistant automatically, without a new release of this integration.
 
 ## Requirements
 
-- Schreibwerkstatt **4.16** or later (provides `/metrics.json`)
+- Schreibwerkstatt **4.16** or later (provides `/metrics.json`); **4.21** or later for characters
+  per person and per day and for the [history back-fill](#history)
 - Home Assistant **2025.1** or later
 - An API token from Schreibwerkstatt: **Admin → Settings → API / Metrics → Create token**.
-  Tick **Per-user values** to also receive writing time, words, daily goal and cost per user
+  Tick **Per-user values** to also receive writing time, characters, words, daily goal and cost per user
   (no book titles, no content). Issuing such a token is recorded in the admin audit log.
 
 ## Installation
@@ -52,18 +53,37 @@ host name only needs the URL updated — re-adding the integration with the new 
 |---|---|
 | **Schreibwerkstatt** | uptime, memory, database size, JS errors (24 h), pending registrations |
 | Schreibwerkstatt Users | users per status, active users 24 h / 7 days |
-| Schreibwerkstatt Content | books, chapters, sections, characters, words, standard pages |
-| Schreibwerkstatt Writing | writing / editing / dictation time today, net words today |
+| Schreibwerkstatt Content | books (all / with text), chapters, sections, characters, words, standard pages, characters per book and per person |
+| Schreibwerkstatt Writing | writing / editing / dictation time today, net characters and words today, characters per writing hour |
 | Schreibwerkstatt Jobs | running and queued jobs, finished / failed in 24 h |
 | Schreibwerkstatt AI | cost today / this month / total, tokens per provider and model, Anthropic billing |
 | Schreibwerkstatt Block merge | merge telemetry (diagnostic) |
-| **one device per user** | writing time today, daily goal %, *daily goal reached*, words today, books, AI cost, last seen |
+| **one device per user** | writing time today, daily goal %, *daily goal reached*, characters and words (today and in stock), characters per writing hour, books, AI cost, last seen |
 
 Breakdowns with many label combinations (cost per job type, cache tokens, job history per type,
 devices per client version) are created disabled — enable the ones you want.
 
+Three values are computed by the integration, by the same rules live and in the back-filled
+history: **characters per book** (over books with text), **characters per person** (over people
+with characters of their own, so readers do not pull it down) and **characters per writing hour**
+(net characters today over writing time today, from 10 minutes of writing on).
+
 Daily and monthly totals report `last_reset` (midnight / first of month in the server's time zone),
-so long-term statistics restart correctly.
+so long-term statistics restart correctly. Net characters and words today can fall (text deleted);
+they are daily totals, so a chart's *change* per day is the day's net.
+
+### History
+
+The server keeps a snapshot of every book every evening. On every start the integration fetches
+these days (`/metrics/history.json`, Schreibwerkstatt 4.21+) and writes them into the long-term
+statistics of the matching sensors — characters, words and books in stock, net per day, writing /
+editing / dictation time, per person and the computed averages and pace. Charts then show the whole
+past instead of starting on the day of the set-up.
+
+Only days before a sensor's first recorded statistic are written: what the recorder collected
+itself is never overwritten, and later starts find nothing left to add. The last 365 days are daily,
+older ones month-end values (the server thins its snapshots). Deleted books are gone from the
+history too. Without the recorder, or with an older server, nothing happens.
 
 User devices are named after the display name in Schreibwerkstatt (the e-mail if none is set) and
 identified by the e-mail: when the name changes, the device is renamed and entities, entity IDs and
@@ -72,8 +92,9 @@ history stay.
 ### Dashboard
 
 The integration ships a dashboard strategy that builds a complete dashboard from the entities that
-actually exist — one section per user seen in the last 14 days (the others in a compact list; daily
-goal gauge and AI tiles only where they apply), daily token charts for the AI models used in the last
+actually exist — characters first (today, in stock, per book and person, pace), one section per
+user seen in the last 14 days under *People* (the others in a compact list; daily goal gauge and AI
+tiles only where they apply), daily token charts for the AI models used in the last
 30 days (input and output apart), every model ever used under *Content & operations*, enabled
 breakdowns under *Diagnostics*. No entity IDs to adapt: they depend on the users'
 display names and your HA language, so the strategy asks the integration instead of guessing.
@@ -108,6 +129,14 @@ resource entry — they are awaited, `add_extra_js_url` modules are not.
 New users and models appear on the next reload of the dashboard. To customise it, use
 **⋮ → Take control**: Home Assistant turns the generated dashboard into regular YAML with your
 real entity IDs. See [examples/dashboard.yaml](examples/dashboard.yaml) for the options.
+
+### Milestones
+
+[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fschreibwerkstatt%2Fhomeassistant%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fschreibwerkstatt%2Fmilestone.yaml)
+
+The blueprint [milestone.yaml](blueprints/automation/schreibwerkstatt/milestone.yaml) runs your
+actions whenever a counter passes a round mark — every 100,000 characters in stock, every 10,000
+characters of one person. A restart or an outage does not count as passing one.
 
 ### Automation example
 

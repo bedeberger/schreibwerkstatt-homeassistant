@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -53,6 +54,82 @@ class Sample:
         return [v for k, v in sorted(self.labels.items()) if k not in USER_LABELS and v]
 
 
+def _derived(name: str, group: str, de: str, en: str, icon: str) -> Metric:
+    return Metric(
+        name=name,
+        group=group,
+        title={"de": de, "en": en},
+        unit=None,
+        device_class=None,
+        state_class="measurement",
+        reset=None,
+        icon=icon,
+        diagnostic=False,
+        enabled_default=True,
+        entity=True,
+        per_user=group == "user",
+    )
+
+
+# Computed by the integration (derive) from what the server reports.
+CHARS_PER_BOOK = _derived(
+    "sw_chars_per_book", "content", "Zeichen pro Buch", "Characters per book", "mdi:book-open-page-variant"
+)
+CHARS_PER_AUTHOR = _derived(
+    "sw_chars_per_author", "content", "Zeichen pro Person", "Characters per person", "mdi:account-edit"
+)
+_PACE = ("Zeichen pro Schreibstunde", "Characters per writing hour", "mdi:speedometer")
+CHARS_PER_HOUR = _derived("sw_chars_per_hour", "writing", *_PACE)
+USER_CHARS_PER_HOUR = _derived("sw_user_chars_per_hour", "user", *_PACE)
+# Below this the pace is noise: two sentences in one minute make 6000 characters an hour.
+MIN_WRITING_SECONDS = 600
+
+type Values = Mapping[str, tuple[dict[str, str], float]]
+
+
+def _per_hour(chars: float | None, seconds: float | None) -> float | None:
+    if chars is None or seconds is None or seconds < MIN_WRITING_SECONDS:
+        return None
+    return round(chars / seconds * 3600)
+
+
+def derive(values: Values) -> list[tuple[Metric, dict[str, str], float]]:
+    """Values the server does not report, from sample key → (labels, value).
+
+    Works on one poll as on one day of history, so live values and the imported
+    past follow the same rules:
+    - per book: over books with text (servers before sw_books_written: all books);
+    - per person: over people with characters of their own, so someone who only
+      reads along does not pull the average down;
+    - per writing hour: net characters today over writing time today, from
+      MIN_WRITING_SECONDS on.
+    """
+
+    def get(key: str) -> float | None:
+        hit = values.get(key)
+        return hit[1] if hit else None
+
+    out: list[tuple[Metric, dict[str, str], float]] = []
+    chars = get("sw_chars")
+    books = get("sw_books_written")
+    if books is None:
+        books = get("sw_books")
+    if chars is not None and books:
+        out.append((CHARS_PER_BOOK, {}, round(chars / books)))
+    own = [v for k, (_, v) in values.items() if k.startswith("sw_user_chars|") and v > 0]
+    if own:
+        out.append((CHARS_PER_AUTHOR, {}, round(sum(own) / len(own))))
+    pace = _per_hour(get("sw_chars_today"), get("sw_writing_seconds_today"))
+    if pace is not None:
+        out.append((CHARS_PER_HOUR, {}, pace))
+    for key, (labels, seconds) in values.items():
+        if key.startswith("sw_user_writing_seconds_today|"):
+            pace = _per_hour(get(sample_key("sw_user_chars_today", labels)), seconds)
+            if pace is not None:
+                out.append((USER_CHARS_PER_HOUR, labels, pace))
+    return out
+
+
 def sample_key(name: str, labels: dict[str, str]) -> str:
     """Stable identity of a sample: metric name plus its sorted identifying labels."""
     keys = sorted(k for k in labels if k not in DESCRIPTIVE_LABELS)
@@ -102,6 +179,9 @@ class MetricsData:
                 data.samples[key] = Sample(key, metric, labels, float(s.get("value") or 0))
                 if metric.per_user and labels.get("user"):
                     data.users[labels["user"]] = labels.get("user_name") or labels["user"]
+        for metric, labels, value in derive({k: (v.labels, v.value) for k, v in data.samples.items()}):
+            key = sample_key(metric.name, labels)
+            data.samples[key] = Sample(key, metric, labels, float(value))
         return data
 
     def label_value(self, name: str, label: str) -> str | None:

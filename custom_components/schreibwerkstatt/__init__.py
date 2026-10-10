@@ -16,6 +16,7 @@ from .const import DOMAIN
 from .coordinator import SchreibwerkstattConfigEntry, SchreibwerkstattCoordinator
 from .entity import instance_key, user_identifier
 from .frontend import async_setup_frontend
+from .history import async_import_history
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,6 +42,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: SchreibwerkstattConfigEn
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_reload))
+    # After the platforms: the import needs the sensors' entity IDs and units.
+    entry.async_create_background_task(
+        hass, async_import_history(hass, coordinator), f"{DOMAIN} history import"
+    )
 
     @callback
     def _sync_user_names() -> None:
